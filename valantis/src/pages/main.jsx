@@ -1,11 +1,17 @@
-import { useState,  } from 'react'
+import { useState, useEffect } from 'react'
 import * as S from './App.styles'
-import { usePostIdsMutation } from '../services/appService'
-
+import { useGetAllItemsMutation, useGetAllIdsQuery } from '../services/appService'
+import { ListItem } from '../components/goodItem/goodItem.jsx'
 
 export const GoodsList = () => {
+
       
   const [findData, setFindData] = useState({})
+  const [query] = useState({
+    "action": "filter",
+    "params": {"product": "рубин"}
+      })
+  const [goods, setGoods] = useState([])
   // const [query, setQuery] = useState(null)
   // const [currentPage, setCurrentPage] = useState(1)
   // const [perPage] = useState(10)
@@ -25,11 +31,32 @@ export const GoodsList = () => {
   //   }
   // }, [query, currentPage, perPage, searchIn])
 
+  const {
+    data: ids,
+    // isFetching,
+    // isLoading,
+    // isError,
+    // error,
+    // isSuccess,
+  } = useGetAllIdsQuery(query)
+  // console.log(ids?.result);
 
-  const [getIds, result] = usePostIdsMutation()
+  const [getItems, items] = useGetAllItemsMutation()
 
-console.log(result);
+  useEffect(() => {
+    if(ids?.result){getItems(ids.result)}
+  }, [ids]);
 
+  useEffect(() => {
+    if(items?.data?.result){setGoods(items.data.result.reduce((acc, cur) => {
+  if (!acc.find(item => item.id == cur.id)) {
+    acc.push(cur);
+  }
+  return acc;
+}, []))}
+  }, [items]);
+
+console.log(goods);
   // const {
   //   data: users,
   //   isFetching,
@@ -77,10 +104,10 @@ console.log(result);
         </S.usersPerPage> */}
         {/* {users && <Filter data={query} setData={setQuery} />} */}
         <S.userFindBtn
-          onClick={() => {
-            getIds()
-            // setQuery((prev) => ({ ...prev, ...findData }))
-          }}
+          // onClick={() => {
+          //   getIds()
+          //   // setQuery((prev) => ({ ...prev, ...findData }))
+          // }}
         >
           Найти
         </S.userFindBtn>
@@ -100,29 +127,30 @@ console.log(result);
         {isSuccess && ( */}
           <>
             <S.contentTitle>
-              <S.titleCol01>avatar & login</S.titleCol01>
-              <S.titleCol02>page on GitHub</S.titleCol02>
-              <S.titleCol04>details</S.titleCol04>
+              <S.titleCol01>id</S.titleCol01>
+              <S.titleCol02>Название</S.titleCol02>
+              <S.titleCol03>Цена</S.titleCol03>
+              <S.titleCol04>Бренд</S.titleCol04>
             </S.contentTitle>
             <S.contentUserList>
               {/* {isFetching &&
                 Array(perPage)
                   .fill()
-                  .map(() => <ListItem key={Math.random()} />)}
-              {users?.items?.length ? (
-                users.items.map((user) => (
-                  <ListItem key={user?.id} user={user} setModal={setModal} />
-                ))
-              ) : (
-                <S.filterNotFound>
-                  Пользователей, соответствующих вашему запросу, не найдено
-                  <img
-                    src="img/smile_crying.png"
-                    alt="crying"
-                    style={{ width: 52, height: 52 }}
-                  />
-                </S.filterNotFound>
-              )} */}
+                  .map(() => <ListItem key={Math.random()} />)} */}
+              {goods?.length && (
+                goods.map(item => 
+                  <ListItem key={item.id} good={item}/>
+                ))}
+              {/* // ) : (
+              //   <S.filterNotFound>
+              //     Пользователей, соответствующих вашему запросу, не найдено
+              //     <img
+              //       src="img/smile_crying.png"
+              //       alt="crying"
+              //       style={{ width: 52, height: 52 }}
+              //     />
+              //   </S.filterNotFound>
+              // )} */}
             </S.contentUserList>
           </>
         {/* )} */}
