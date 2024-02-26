@@ -1,5 +1,32 @@
 import { styled } from 'styled-components'
 
+export const wrapper = styled.div`
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background-color: #383838;
+`
+export const container = styled.div`
+  max-width: 1920px;
+  height: 100vh;
+  margin: 0 auto;
+  position: relative;
+  background-color: #181818;
+`
+export const main = styled.main`
+height: 100%;
+  -webkit-box-flex: 1;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+`
 export const mainCentalBlock = styled.div`
   width: auto;
   -webkit-box-flex: 3;
@@ -159,6 +186,8 @@ export const contentUserList = styled.ul`
   &::-webkit-scrollbar {
     display: none;
   }
+  list-style: none;
+  padding: 0;
 `
 export const titleColumn = styled.div`
   font-style: normal;
@@ -170,17 +199,17 @@ export const titleColumn = styled.div`
   text-transform: uppercase;
 `
 export const titleCol01 = styled(titleColumn)`
-  width: 250px;
+  width: 320px;
 `
 export const titleCol02 = styled(titleColumn)`
-  width: 321px;
+  width: 450px;
 `
 export const titleCol03 = styled(titleColumn)`
-  width: 245px;
+  width: 75px;
 `
 export const titleCol04 = styled(titleColumn)`
-  width: 60px;
-  text-align: end;
+  width: 75px;
+  text-align: start;
 `
 export const titleSvg = styled.svg`
   width: 12px;

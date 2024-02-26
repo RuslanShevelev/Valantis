@@ -17,7 +17,7 @@ export const goodsApi = createApi({
     },
   }),
   endpoints: (build) => ({
-    getAllIds: build.query({
+    getCurrentIds: build.query({
       query: (body) =>({
     method: 'POST',
     body: body,
@@ -32,10 +32,21 @@ export const goodsApi = createApi({
           }
     }),
     }),
+    getFilteredIds: build.mutation({
+      query: (params) =>({
+    method: 'POST',
+    body: {
+        "action": "filter",
+        "params": params,
+          }
+    }),
+    }),
+
   }),
 })
 
 export const {
-  useGetAllIdsQuery,
+  useGetCurrentIdsQuery,
+  useGetFilteredIdsMutation,
   useGetAllItemsMutation,
 } = goodsApi
