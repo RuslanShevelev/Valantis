@@ -260,3 +260,16 @@ export const usersPerPage = styled.div`
   align-items: center;
   gap: 10px;
 `
+export const filterItem = styled.li`
+  font-family: 'StratosSkyeng', sans-serif;
+  color: ${(props) => (props.$isSelected ? '#b672ff' : 'white')};
+  font-variant-numeric: lining-nums proportional-nums;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 24px; /* 120% */
+  &:hover {
+    color: #b672ff;
+    text-decoration-line: underline;
+    cursor: pointer;
+   } `

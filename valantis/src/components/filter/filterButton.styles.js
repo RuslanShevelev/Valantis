@@ -33,6 +33,7 @@ export const filterButton = styled.button`
 export const filterPopup = styled.div`
   max-height: 305px;
   width: 248px;
+  box-sizing: border-box;
   display: inline-flex;
   padding: 34px;
   flex-direction: column;
@@ -61,6 +62,8 @@ export const filterPopup = styled.div`
 
 export const filterList = styled.ul`
   width: 180px;
+  margin:0;
+  padding:0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

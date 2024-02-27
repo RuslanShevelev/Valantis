@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import * as S from "./App.styles";
 import {
   useGetCurrentIdsQuery,
+  useGetFieldsValueQuery,
   useGetAllItemsMutation,
   useGetFilteredIdsMutation,
 } from "../services/appService";
@@ -13,7 +14,7 @@ export const GoodsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(50);
   const [findData, setFindData] = useState({});
-  const [pagesCount, setPagesCount] = useState();
+  const [pagesCount, setPagesCount] = useState(null);
   const [query, setQuery] = useState({
     action: "get_ids",
     params: { offset: 0, limit: 50 },
@@ -23,17 +24,20 @@ export const GoodsList = () => {
   // const [ setUrlParams] = useState('')
   // const [modal, setModal] = useState('')
   const [searchIn, setSearchIn] = useState({ title: "логину", in: "login" });
+  const [getItems, items] = useGetAllItemsMutation();
+  const [getFilteredIds, filteredIds] = useGetFilteredIdsMutation();
 
   useEffect(() => {
-    if (currentPage) {
+    if (currentPage || perPage) {
       setQuery({
         ...query,
-        params: { ...query.params, offset: (currentPage - 1) * perPage },
+        params: {
+          ...query.params,
+          offset: (currentPage - 1) * perPage,
+          limit: perPage,
+        },
       });
     }
-    // if (perPage) {
-    //   setQuery({ ...query, params: { ...query.params, limit: perPage } });
-    // }
   }, [currentPage, perPage]);
 
   const {
@@ -44,16 +48,23 @@ export const GoodsList = () => {
     // error,
     // isSuccess,
   } = useGetCurrentIdsQuery(query);
-  console.log(query);
+  const {
+    data: brands,
+  } = useGetFieldsValueQuery({
+    "action": "get_fields",
+    "params": {"field": "brand"}
+   });
+  console.log(Array.from(new Set(brands?.result)));
 
-  const [getItems, items] = useGetAllItemsMutation();
-  const [getFilteredIds, filteredIds] = useGetFilteredIdsMutation();
+  useEffect(() => {
+    if (filteredIds.isSuccess)
+      setPagesCount(Math.ceil(filteredIds?.data?.result?.length / perPage));
+  }, [filteredIds]);
 
   useEffect(() => {
     if (ids?.result) {
-      getFilteredIds({ product: "" });
-      setPagesCount(Math.ceil(filteredIds?.data?.result?.length / perPage));
       getItems(ids.result);
+      getFilteredIds({ product: "" });
     }
   }, [ids]);
 
@@ -70,7 +81,7 @@ export const GoodsList = () => {
     }
   }, [items]);
 
-  console.log(currentPage);
+  // console.log(pagesCount);
   // const {
   //   data: users,
   //   isFetching,
@@ -105,15 +116,20 @@ export const GoodsList = () => {
               </S.centalBlockSearch>
               <S.filterBlock>
                 <S.usersPerPage>
-                  <span> Искать по </span>
+                  <span style={{color:'white'}}> Искать по </span>
                   <FilterCategory
-                    title={searchIn?.title}
-                    content={[
-                      { title: "логину", in: "login" },
-                      { title: "имени", in: "name" },
-                      { title: "электронной почте", in: "email" },
-                      { title: "везде", in: "" },
-                    ]}
+                    title="Бренду"
+                    content={Array.from(new Set(brands?.result)).sort()
+                      // 
+                      // .map((brand) => (
+                      //   <S.filterItem
+                      //     key={brand}
+                      //     // $isSelected={selectedFilterItems.authors.includes(author)}
+                      //     // onClick={() => dispatch(selectFilterItem({ authors: author }))}
+                      //   >
+                      //     {brand}
+                      //   </S.filterItem>
+                      }
                     activeFilter={searchIn?.title}
                     setFilter={setSearchIn}
                   />
@@ -172,26 +188,23 @@ export const GoodsList = () => {
                 {/* )} */}
               </S.centalBlockContent>
             </div>
-            {goods && (
-              <S.paginationBlock>
-                <S.usersPerPage>
-                  <span> Выводить по </span>
-                  <FilterCategory
-                    title={perPage}
-                    content={[10, 30, 50, 100]}
-                    pop="up"
-                    activeFilter={perPage}
-                    setFilter={setPerPage}
-                  />
-                </S.usersPerPage>
-                <Pagination
-                  pagesCount={pagesCount}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
+            <S.paginationBlock>
+              <S.usersPerPage>
+                <span style={{color:'white'}}> Выводить по </span>
+                <FilterCategory
+                  title={perPage}
+                  content={[10, 30, 50, 100]}
+                  pop="up"
+                  activeFilter={perPage}
+                  setFilter={setPerPage}
                 />
-              </S.paginationBlock>
-            )}
-
+              </S.usersPerPage>
+              <Pagination
+                pagesCount={pagesCount}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+              />
+            </S.paginationBlock>
             {/* {modal && <UserInfoModal url={modal} closeModal={setModal} />} */}
           </S.mainCentalBlock>
         </S.main>

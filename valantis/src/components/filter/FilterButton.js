@@ -28,7 +28,7 @@ export default function FilterCategory({
           <S.filterList>
             {content.map((item) => (
               <S.filterItem
-                key={item.title ?? item}
+                key={item}
                 onClick={() => {
                   // if (item.title) {
                     setFilter(item)
@@ -38,10 +38,10 @@ export default function FilterCategory({
                   setActive(false)
                 }}
                 $isSelected={
-                  activeFilter === (item?.title || item)
+                  activeFilter === (item)
                 }
               >
-                {item.title ?? item}
+                {item}
               </S.filterItem>
             ))}
           </S.filterList>
