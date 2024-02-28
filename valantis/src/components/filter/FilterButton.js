@@ -15,7 +15,7 @@ export default function FilterCategory({
     <S.filterCategory>
       <S.filterButton
         type="button"
-        $active={(title !== 'умолчанию') && (title !== 10) && (title !== 'логину')}
+        $active={(title !== 'Цене') && (title !== 50) && (title !== 'Бренду')}
         onClick={toggleVisibility}
       >
         {title}

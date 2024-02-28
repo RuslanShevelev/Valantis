@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
+import useDebounce from "../hooks/useDebounce.js";
 import * as S from "./App.styles";
 import {
   useGetCurrentIdsQuery,
   useGetFieldsValueQuery,
   useGetAllItemsMutation,
-  useGetFilteredIdsMutation,
+  useGetFilteredIdsQuery,
 } from "../services/appService";
+import { RotatingLines } from "react-loader-spinner";
 import { ListItem } from "../components/goodItem/goodItem.jsx";
 import FilterCategory from "../components/filter/FilterButton.js";
 import { Pagination } from "../components/pagination/pagelist.jsx";
@@ -13,60 +15,69 @@ import { Pagination } from "../components/pagination/pagelist.jsx";
 export const GoodsList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(50);
-  const [findData, setFindData] = useState({});
   const [pagesCount, setPagesCount] = useState(null);
+  const [findData, setFindData] = useState({ product: "" });
   const [query, setQuery] = useState({
     action: "get_ids",
     params: { offset: 0, limit: 50 },
   });
   const [goods, setGoods] = useState([]);
-  // const [query, setQuery] = useState(null)
-  // const [ setUrlParams] = useState('')
-  // const [modal, setModal] = useState('')
-  const [searchIn, setSearchIn] = useState({ title: "логину", in: "login" });
+  const [filter, setFilter] = useState(false);
+
   const [getItems, items] = useGetAllItemsMutation();
-  const [getFilteredIds, filteredIds] = useGetFilteredIdsMutation();
+  const { data: filteredIds } = useGetFilteredIdsQuery(findData);
+  const debouncedSearch = useDebounce(setFindData, 1500);
 
   useEffect(() => {
-    if (currentPage || perPage) {
+    if ((!filter && (currentPage) || perPage)) {
       setQuery({
         ...query,
         params: {
           ...query.params,
           offset: (currentPage - 1) * perPage,
           limit: perPage,
-        },
+        } 
       });
-    }
-  }, [currentPage, perPage]);
-
-  const {
-    data: ids,
-    // isFetching,
-    // isLoading,
-    // isError,
-    // error,
-    // isSuccess,
-  } = useGetCurrentIdsQuery(query);
-  const {
-    data: brands,
-  } = useGetFieldsValueQuery({
-    "action": "get_fields",
-    "params": {"field": "brand"}
-   });
-  console.log(Array.from(new Set(brands?.result)));
+    } else return
+  }, [currentPage, perPage, filter]);
 
   useEffect(() => {
-    if (filteredIds.isSuccess)
-      setPagesCount(Math.ceil(filteredIds?.data?.result?.length / perPage));
-  }, [filteredIds]);
+    if (findData.product !== "" || findData.price || findData.brand) {
+      setFilter(true);
+    } else {
+      setFilter(false);
+    }
+    setCurrentPage(1);
+  }, [findData]);
+
+  const { data: ids, isLoading: gettingIds } = useGetCurrentIdsQuery(query);
+
+  const { data: brands } = useGetFieldsValueQuery({
+    action: "get_fields",
+    params: { field: "brand" },
+  });
+  const { data: prices } = useGetFieldsValueQuery({
+    action: "get_fields",
+    params: { field: "price" },
+  });
+  useEffect(() => {
+    if (filteredIds?.result)
+      setPagesCount(Math.ceil(filteredIds?.result?.length / perPage));
+  }, [filteredIds, perPage]);
 
   useEffect(() => {
-    if (ids?.result) {
-      getItems(ids.result);
-      getFilteredIds({ product: "" });
+    if (filter && filteredIds?.result) {
+      getItems(
+        filteredIds?.result.slice(
+          (currentPage - 1) * perPage,
+          currentPage * perPage
+        )
+      );
     }
-  }, [ids]);
+    if (!filter && ids?.result) {
+      getItems(ids?.result);
+    }
+  }, [ids, filteredIds]);
 
   useEffect(() => {
     if (items?.data?.result) {
@@ -81,116 +92,105 @@ export const GoodsList = () => {
     }
   }, [items]);
 
-  // console.log(pagesCount);
-  // const {
-  //   data: users,
-  //   isFetching,
-  //   isLoading,
-  //   isError,
-  //   error,
-  //   isSuccess,
-  // } = useGetAllUsersQuery(urlParams)
-
-  // const pagesCount = users ? Math.ceil(users.total_count / perPage) : null
-
   return (
     <S.wrapper>
       <S.container>
         <S.main>
           <S.mainCentalBlock>
             <div>
-              <S.centalBlockSearch className="search">
-                <S.searchSvg>
-                  <use xlinkHref="img/icon/sprite.svg#icon-search" />
-                </S.searchSvg>
+              <S.centalBlockSearch>
+                <svg
+                  width="17"
+                  height="18"
+                  viewBox="0 0 17 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M11.9276 12.7748L15.37 17.0644"
+                    stroke="white"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="8.48533"
+                    cy="8.48526"
+                    r="5.5"
+                    transform="rotate(-38.7469 8.48533 8.48526)"
+                    stroke="white"
+                  />
+                </svg>
                 <S.searchText
-                  className="search__text"
                   type="search"
-                  placeholder="Поиск"
+                  placeholder="Поиск по названию товара"
                   name="search"
+                  value={findData?.product}
                   onChange={(e) => {
-                    e.stopPropagation();
-                    setFindData({ ...findData, q: e.target.value });
+                    debouncedSearch({ product: e.target.value });
                   }}
                 />
               </S.centalBlockSearch>
               <S.filterBlock>
-                <S.usersPerPage>
-                  <span style={{color:'white'}}> Искать по </span>
+                <S.goodsPerPage>
+                  <span style={{ color: "white" }}> Фильтровать по </span>
                   <FilterCategory
-                    title="Бренду"
-                    content={Array.from(new Set(brands?.result)).sort()
-                      // 
-                      // .map((brand) => (
-                      //   <S.filterItem
-                      //     key={brand}
-                      //     // $isSelected={selectedFilterItems.authors.includes(author)}
-                      //     // onClick={() => dispatch(selectFilterItem({ authors: author }))}
-                      //   >
-                      //     {brand}
-                      //   </S.filterItem>
-                      }
-                    activeFilter={searchIn?.title}
-                    setFilter={setSearchIn}
+                    title={findData.price ?? "Цене"}
+                    content={Array.from(new Set(prices?.result)).sort(
+                      (a, b) => a - b
+                    )}
+                    activeFilter={findData?.price}
+                    setFilter={(e) => {
+                      setFindData({ price: e });
+                    }}
                   />
-                </S.usersPerPage>
-                {/* {users && <Filter data={query} setData={setQuery} />} */}
-                <S.userFindBtn
-                // onClick={() => {
-                //   getIds()
-                //   // setQuery((prev) => ({ ...prev, ...findData }))
-                // }}
-                >
-                  Найти
-                </S.userFindBtn>
+                  <FilterCategory
+                    title={findData.brand ?? "Бренду"}
+                    content={Array.from(new Set(brands?.result)).sort()}
+                    activeFilter={findData?.brand}
+                    setFilter={(e) => {
+                      setFindData({ brand: e });
+                    }}
+                  />
+                </S.goodsPerPage>
+                {filter && (
+                  <S.filterBtn onClick={() => setFindData({ product: "" })}>
+                    Все товары
+                  </S.filterBtn>
+                )}
               </S.filterBlock>
               <S.centalBlockContent>
-                {/* {isLoading && (
-          <S.loaderWrap>
-            <RotatingLines visible strokeColor="#b672ff" />
-          </S.loaderWrap>
-        )}
-        {isError && error.status !== 422 && (
-          <div style={{ color: 'red' }}>
-            Не удалось загрузить пользователей, попробуйте позже:{' '}
-            {error.status}
-          </div>
-        )}
-        {isSuccess && ( */}
-                <>
-                  <S.contentTitle>
-                    <S.titleCol01>id</S.titleCol01>
-                    <S.titleCol02>Название</S.titleCol02>
-                    <S.titleCol03>Цена</S.titleCol03>
-                    <S.titleCol04>Бренд</S.titleCol04>
-                  </S.contentTitle>
-                  <S.contentUserList>
-                    {/* {isFetching &&
-                Array(perPage)
-                  .fill()
-                  .map(() => <ListItem key={Math.random()} />)} */}
-                    {goods?.length &&
-                      goods.map((item) => (
+                {gettingIds || items.isLoading ? (
+                  <S.loaderWrap>
+                    <RotatingLines visible strokeColor="#b672ff" />
+                  </S.loaderWrap>
+                ) : goods?.length ? (
+                  <>
+                    <S.contentTitle>
+                      <S.titleCol01>id</S.titleCol01>
+                      <S.titleCol02>Название</S.titleCol02>
+                      <S.titleCol03>Цена</S.titleCol03>
+                      <S.titleCol04>Бренд</S.titleCol04>
+                    </S.contentTitle>
+                    <S.contentGoodsList>
+                      {goods.map((item) => (
                         <ListItem key={item.id} good={item} />
                       ))}
-                    {/* // ) : (
-              //   <S.filterNotFound>
-              //     Пользователей, соответствующих вашему запросу, не найдено
-              //     <img
-              //       src="img/smile_crying.png"
-              //       alt="crying"
-              //       style={{ width: 52, height: 52 }}
-              //     />
-              //   </S.filterNotFound>
-              // )} */}
-                  </S.contentUserList>
-                </>
-                {/* )} */}
+                    </S.contentGoodsList>
+                  </>
+                ) : (
+                  <S.filterNotFound>
+                    Товаров, соответствующих вашему запросу, не найдено
+                    <img
+                      src="img/smile_crying.png"
+                      alt="crying"
+                      style={{ width: 52, height: 52 }}
+                    />
+                  </S.filterNotFound>
+                )}
               </S.centalBlockContent>
             </div>
             <S.paginationBlock>
-              <S.usersPerPage>
-                <span style={{color:'white'}}> Выводить по </span>
+              <S.goodsPerPage>
+                <span style={{ color: "white" }}> Выводить по </span>
                 <FilterCategory
                   title={perPage}
                   content={[10, 30, 50, 100]}
@@ -198,14 +198,14 @@ export const GoodsList = () => {
                   activeFilter={perPage}
                   setFilter={setPerPage}
                 />
-              </S.usersPerPage>
+                <span style={{ color: "white" }}> товаров </span>
+              </S.goodsPerPage>
               <Pagination
                 pagesCount={pagesCount}
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
               />
             </S.paginationBlock>
-            {/* {modal && <UserInfoModal url={modal} closeModal={setModal} />} */}
           </S.mainCentalBlock>
         </S.main>
       </S.container>

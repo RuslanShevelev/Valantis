@@ -52,14 +52,14 @@ export const centalBlockSearch = styled.div`
   -ms-flex-align: center;
   align-items: center;
 `
-export const centalBlockH2 = styled.h2`
-  font-style: normal;
-  font-weight: 400;
-  font-size: 64px;
-  line-height: 72px;
-  letter-spacing: -0.8px;
-  margin-bottom: 25px;
-`
+// export const centalBlockH2 = styled.h2`
+//   font-style: normal;
+//   font-weight: 400;
+//   font-size: 64px;
+//   line-height: 72px;
+//   letter-spacing: -0.8px;
+//   margin-bottom: 25px;
+// `
 
 export const centalBlockContent = styled.div`
   display: -webkit-box;
@@ -84,7 +84,7 @@ export const filterBlock = styled.div`
   justify-content: space-around;
   align-items: flex-start;
 `
-export const userFindBtn = styled.button`
+export const filterBtn = styled.button`
   height: 35px;
   width: 150px;
   padding: 0 15px;
@@ -168,9 +168,9 @@ export const contentTitle = styled.div`
   -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin: 24px 0 0;
 `
-export const contentUserList = styled.ul`
+export const contentGoodsList = styled.ul`
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -211,12 +211,12 @@ export const titleCol04 = styled(titleColumn)`
   width: 75px;
   text-align: start;
 `
-export const titleSvg = styled.svg`
-  width: 12px;
-  height: 12px;
-  fill: transparent;
-  stroke: #696969;
-`
+// export const titleSvg = styled.svg`
+//   width: 12px;
+//   height: 12px;
+//   fill: transparent;
+//   stroke: #696969;
+// `
 export const filterNotFound = styled.div`
   width: 100%;
   margin-top: 50px;
@@ -233,6 +233,7 @@ export const filterNotFound = styled.div`
   justify-content: center;
   font-size: 24px;
   line-height: 30px;
+  color:white;
 `
 export const loaderWrap = styled.div`
 position: fixed;
@@ -253,7 +254,7 @@ export const paginationBlock = styled.div`
   justify-content: space-around;
   align-items: flex-start;
 `
-export const usersPerPage = styled.div`
+export const goodsPerPage = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-around;

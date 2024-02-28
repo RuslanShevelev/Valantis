@@ -40,13 +40,6 @@ export const goodTitleId = styled.div`
   width: 320px;
   color: #ffffff;
 `
-// export const userTitleSpan = styled.span`
-//   font-style: normal;
-//   font-weight: 400;
-//   font-size: 16px;
-//   line-height: 24px;
-//   color: #4e4e4e;
-// `
 export const goodName = styled.div`
   display: -webkit-box;
   display: -ms-flexbox;
@@ -64,9 +57,8 @@ export const goodPrice = styled.div`
   font-size: 16px;
   line-height: 24px;
   color: #ffffff;
-  text-align: left;
+  text-align: right;
   width: 75px;
-
 `
 export const goodBrand = styled.div`
   font-style: normal;
@@ -76,21 +68,4 @@ export const goodBrand = styled.div`
   color: #ffffff;
   text-align: left;
   width: 75px;
-`
-export const userInfoBtn = styled.button`
-  height: 35px;
-  padding: 0 15px;
-  background-color: #696969;;
-  border-radius: 7px;
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  text-align: right;
-  color: black;
-  border: none;
-  cursor: pointer;
-  &:hover{
-    background-color: #b672ff;
-  }
 `
