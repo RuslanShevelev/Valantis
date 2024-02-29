@@ -6,11 +6,10 @@ const md5 = require("md5");
 const timeStamp = getTimeStamp(Date.now());
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://api.valantis.store:40000",
+  baseUrl: "https://api.valantis.store:41000",
   prepareHeaders: (headers) => {
     if (timeStamp) {
       headers.set("X-Auth", md5(`Valantis_${timeStamp}`));
-      // headers.set("Content-Type", "multipart/form-data");
     }
     return headers;
   },
