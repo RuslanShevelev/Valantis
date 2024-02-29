@@ -10,6 +10,7 @@ const baseQuery = fetchBaseQuery({
   prepareHeaders: (headers) => {
     if (timeStamp) {
       headers.set("X-Auth", md5(`Valantis_${timeStamp}`));
+      // headers.set("Content-Type", "multipart/form-data");
     }
     return headers;
   },
