@@ -39,6 +39,7 @@ export const GoodsList = () => {
         } 
       });
     } else return
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage, perPage, filter]);
 
   useEffect(() => {
@@ -77,6 +78,7 @@ export const GoodsList = () => {
     if (!filter && ids?.result) {
       getItems(ids?.result);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ids, filteredIds]);
 
   useEffect(() => {
