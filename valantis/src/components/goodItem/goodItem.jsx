@@ -1,4 +1,3 @@
-import "react-loading-skeleton/dist/skeleton.css";
 import * as S from "./goodItem.styles";
 
 export const ListItem = ({ good }) => (
