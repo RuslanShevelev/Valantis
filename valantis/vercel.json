@@ -1,7 +1,10 @@
 {
     "version": 2,
-    "target": "serverless",
-    "routes": [
-      { "src": "/(.*)", "status": 301, "headers": { "Location": "https://$VERCEL_URL/$1" } }
+    "rewrites": [
+      {
+        "source": "/(.*)",
+        "destination": "https://$VERCEL_URL/$1",
+        "statusCode": 301
+      }
     ]
   }
