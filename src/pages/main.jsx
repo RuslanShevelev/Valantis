@@ -125,7 +125,6 @@ export const GoodsList = () => {
                   type="search"
                   placeholder="Поиск по названию товара"
                   name="search"
-                  value={findData?.product}
                   onChange={(e) => {
                     debouncedSearch({ product: e.target.value });
                   }}
